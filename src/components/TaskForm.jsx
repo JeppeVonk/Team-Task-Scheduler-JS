@@ -7,15 +7,19 @@ export default function TaskForm({ tasks, setTasks }) {
 
     function addTask() {
         if (!taak) return;
-        setTasks([...tasks, { taak, scope, aantal: parseInt(aantal) }]);
+        setTasks([...tasks, { taak, scope, aantal: Number(aantal) }]);
         setTaak("");
         setAantal(1);
+    }
+
+    function removeTask(idx) {
+        setTasks(tasks.filter((_, i) => i !== idx));
     }
 
     return (
         <div className="p-4 border rounded-lg bg-white shadow">
             <h2 className="text-xl font-bold mb-2">Taken</h2>
-            <div className="flex gap-2 mb-2">
+            <div className="flex flex-wrap gap-2 mb-2">
                 <input
                     className="border p-1"
                     placeholder="Taak"
@@ -40,18 +44,38 @@ export default function TaskForm({ tasks, setTasks }) {
                 />
                 <button
                     onClick={addTask}
-                    className="bg-blue-500 text-white px-3 py-1 rounded"
+                    className="bg-blue-600 text-white px-3 py-1 rounded"
                 >
                     +
                 </button>
-                <ul className="list-disc pl-5">
-                    {tasks.map((t, i) => (
-                        <li key={i}>
-                            {t.taak} ({t.scope}, {t.aantal} pers.)
-                        </li>
-                    ))}
-                </ul>
             </div>
+            <table className="w-full border text-sm">
+                <thead>
+                    <tr className="bg-gray-100">
+                        <th className="border px-2 py-1 text-left">Taak</th>
+                        <th className="border px-2 py-1">Scope</th>
+                        <th className="border px-2 py-1">Aantal</th>
+                        <th className="border px-2 py-1"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {tasks.map((t,i)=>(
+                        <tr key={i}>
+                            <td className="border px-2 py-1">{t.taak}</td>
+                            <td classname="border px-2 py-1 text-center">{t.scope}</td>
+                            <td className="border px-2 py-1 text-center">{t.aantal}</td>
+                            <td className="border px-2 py-1 text-center">
+                                <button
+                                    onClick={()=>removeTask(i)}
+                                    className="text-red-600"
+                                >
+                                    ✕
+                                </button>
+                            </td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
         </div>
     );
 }
