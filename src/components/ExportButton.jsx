@@ -13,7 +13,7 @@ export default function ExportButton({ schedule, stats }) {
     return (
         <button
             onClick={exportExcel}
-            className="px-4 py-2 bg-green-500 text-white rounded-lg"
+            className="px-4 py-2 bg-green-600 text-white rounded-lg shadow"
         >
             Exporteer naar Excel
         </button>
