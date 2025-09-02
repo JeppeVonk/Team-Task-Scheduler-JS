@@ -15,10 +15,14 @@ export default function MatchForm({ matches, setMatches }) {
         setTeam("");
     }
 
+    function removeMatch(idx) {
+        setMatches(matches.filter((_,i)=>i!==idx));
+    }
+
     return (
         <div className="p-4 border rounded-lg bg-white shadow">
             <h2 className="text-xl font-bold mb-2">Wedstrijden</h2>
-            <div className="flex gap-2 mb-2">
+            <div className="flex flex-wrap gap-2 mb-2">
                 <input
                     type="date"
                     value={date}
@@ -46,18 +50,41 @@ export default function MatchForm({ matches, setMatches }) {
                 </select>
                 <button
                     onClick={addMatch}
-                    className="bg-blue-500 text-white px-3 py-1 rounded"
+                    className="bg-blue-600 text-white px-3 py-1 rounded"
                 >
                     +
                 </button>
             </div>
-            <ul className="list-disc pl-5">
-                {matches.map((m, i) => (
-                    <li key={i}>
-                        {m.jaar}-{m.maand}-{m.dag}: {m.club} ({m.isUit === "ja" ? "Uit" : "Thuis"})
-                    </li>
-                ))}
-            </ul>
+
+            <table className="w-full border text-sm">
+                <thead>
+                    <tr className="bg-gray-100">
+                        <th className="border px-2 py-1">Datum</th>
+                        <th className="border px-2 py-1">Club</th>
+                        <th className="border px-2 py-1">Team</th>
+                        <th className="border px-2 py-1">Uit/Thuis</th>
+                        <th className="border px-2 py-1"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {matches.map((m,i)=>(
+                        <tr key={i}>
+                            <td className="border px-2 py-1">{m.jaar}-{m.maand}-{m.dag}</td>
+                            <td className="border px-2 py-1">{m.club}</td>
+                            <td className="border px-2 py-1">{m.team}</td>
+                            <td className="border px-2 py-1">{m.uit === "ja" ? "Uit" : "Thuis"}</td>
+                            <td className="border px-2 py-1 text-center">
+                                <button
+                                    onClick={()=>removeMatch(i)}
+                                    className="text-red-600"
+                                >
+                                    ✕
+                                </button>
+                            </td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
         </div>
     );
 }
