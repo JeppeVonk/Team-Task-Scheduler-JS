@@ -16,7 +16,7 @@ export default function App() {
     const [result, setResult] = useState(null);
 
     function generate() {
-        const { schedule, stats } = buildSchedule(tasks, players, matches, distances, RANDOM_SEED);
+        const { schedule, stats } = buildSchedule(tasks, matches, players, distances, RANDOM_SEED);
         setResult({ schedule, stats });
     }
 
