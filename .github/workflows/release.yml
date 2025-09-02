@@ -1,0 +1,111 @@
+name: Release Team Task Scheduler
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write # needed for pushing changelogs + tags, and creating releases
+
+env:
+  PYTHON_VERSION: "3.12"
+  POETRY_VERSION: "2.1.3"
+  VENV_PATH: ".venv"
+
+jobs:
+  bump_version:
+    name: Bump version & changelog
+    runs-on: ubuntu-latest
+    if: ${{ !startsWith(github.event.head_commit.message, 'bump:') }}
+    outputs:
+      version: ${{ steps.cz.outputs.version }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: "${{ secrets.GITHUB_TOKEN }}"
+
+      # TODO: Might not even need Python install when using commitizen action
+      - name: Set up Python
+        id: setup-python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Debug Python environment after setup
+        run: |
+          echo "System Python versions:"
+          python --version
+          python3 --version
+          which python
+          which python3
+          echo "Setup-python absolute path:"
+          echo "${{ steps.setup-python.outputs.python-path }}"
+
+      - name: Cache virtual environment
+        id: cached-deps
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.VENV_PATH }}
+          key: >-
+            ${{ runner.os }}-venv-${{
+              steps.setup-python.outputs.python-version
+            }}-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: >-
+            ${{ runner.os }}-venv-${{
+              steps.setup-python.outputs.python-version
+            }}-
+
+      - name: Set up virtual environment
+        if: steps.cached-deps.outputs.cache-hit != 'true'
+        run: |
+          python -m venv ${{ env.VENV_PATH }}
+          source ${{ env.VENV_PATH }}/bin/activate
+          pip install --upgrade pip
+
+      - name: Install dependencies
+        if: steps.cached-deps.outputs.cache-hit != 'true'
+        run: |
+          source ${{ env.VENV_PATH }}/bin/activate
+          pip install -r requirements.txt
+
+      - name: Debug after dependency install
+        run: |
+          source ${{ env.VENV_PATH }}/bin/activate
+          python --version
+          pip list | head -20
+
+      - name: Bump version and create changelog
+        id: cz
+        uses: commitizen-tools/commitizen-action@0.24.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Print new version
+        run: |
+          echo "New version: ${{ steps.cz.outputs.version }}"
+
+  create_release:
+    name: Create GitHub Release
+    needs: bump_version
+    runs-on: ubuntu-latest
+    if: needs.bump_version.outputs.version != ''
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Fetch tags
+        run: git fetch --tags
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ needs.bump_version.outputs.version }}
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
