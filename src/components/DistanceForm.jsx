@@ -6,9 +6,13 @@ export default function DistanceForm({ distances, setDistances }) {
 
     function addDistance() {
         if (!club || !km) return;
-        setDistances([...distances, { club, afstand_km: parseInt(km) }]);
+        setDistances([...distances, { club, afstand_km: Number(km) }]);
         setClub("");
         setKm("");
+    }
+
+    function removeDistance(idx) {
+        setDistances(distances.filter((_,i)=>i!==idx));
     }
 
     return (
@@ -23,25 +27,43 @@ export default function DistanceForm({ distances, setDistances }) {
                 />
                 <input
                     type="number"
-                    className="border p-1 w-20"
+                    className="border p-1 w-24"
                     placeholder="Km"
                     value={km}
                     onChange={(e) => setKm(e.target.value)}
                 />
                 <button
                     onClick={addDistance}
-                    className="bg-blue-500 text-white px-3 py-1 rounded"
+                    className="bg-blue-600 text-white px-3 py-1 rounded"
                 >
                     +
                 </button>
             </div>
-            <ul className="list-disc pl-5">
-                {distances.map((d, i) => (
-                    <li key={i}>
-                        {d.club}: {d.afstand_km} km
-                    </li>
-                ))}
-            </ul>
+            <table className="w-full border text-sm">
+                <thead>
+                    <tr className="bg-gray-100">
+                        <th className="border px-2 py-1">Club</th>
+                        <th className="border px-2 py-1">Km</th>
+                        <th className="border px-2 py-1"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {distances.map((d,i)=>(
+                        <tr key={i}>
+                            <td className="border px-2 py-1">{d.club}</td>
+                            <td className="border px-2 py-1 text-right">{d.afstand_km}</td>
+                            <td className="border px-2 py-1 text-center">
+                                <button
+                                    onClick={()=>removeDistance(i)}
+                                    className="text-red-600"
+                                >
+                                    ✕
+                                </button>
+                            </td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
         </div>
     );
 }
