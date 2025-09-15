@@ -1,0 +1,21 @@
+default_language_version:
+  python: python3.12
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: check-added-large-files
+      - id: check-merge-conflict
+      - id: check-yaml
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+        args:
+          - --markdown-linebreak-ext=md
+
+  - repo: https://github.com/commitizen-tools/commitizen
+    rev: v4.6.0
+    hooks:
+      - id: commitizen
+        name: Commitizen Conventional Commits Check
+        stages: [commit-msg]
