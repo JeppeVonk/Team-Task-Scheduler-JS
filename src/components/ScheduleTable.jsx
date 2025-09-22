@@ -6,7 +6,7 @@ export default function ScheduleTable({ schedule, stats }) {
     return (
         <div className="grid gap-6">
             <div className="p-4 border rounded-lg bg-white shadow">
-                <h2 className="text-xl font-fold mb-3">Schema</h2>
+                <h2 className="text-xl font-bold mb-3">Schema</h2>
                 <div className="overflow-auto">
                     <table className="min-w-full border text-sm">
                         <thead>

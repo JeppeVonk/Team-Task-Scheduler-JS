@@ -62,7 +62,7 @@ export default function TaskForm({ tasks, setTasks }) {
                     {tasks.map((t,i)=>(
                         <tr key={i}>
                             <td className="border px-2 py-1">{t.taak}</td>
-                            <td classname="border px-2 py-1 text-center">{t.scope}</td>
+                            <td className="border px-2 py-1 text-center">{t.scope}</td>
                             <td className="border px-2 py-1 text-center">{t.aantal}</td>
                             <td className="border px-2 py-1 text-center">
                                 <button
