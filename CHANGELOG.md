@@ -1,3 +1,17 @@
+## v0.3.0 (2025-09-22)
+
+### BREAKING CHANGE
+
+- requires React 19+ and Tailwind 4+; project setup and configs changed (vite.config.js replaces postcss/tailwind config files).
+
+### Feat
+
+- **build**: upgrade to React 19, Tailwind 4 and Vite 7
+
+### Fix
+
+- **ui**: correct property names and typos in components
+
 ## v0.2.0 (2025-09-15)
 
 ### BREAKING CHANGE
