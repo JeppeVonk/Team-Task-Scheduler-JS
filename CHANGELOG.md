@@ -1,3 +1,9 @@
+## v0.4.1 (2025-09-22)
+
+### Perf
+
+- **export**: memoize Excel export function with useCallback
+
 ## v0.4.0 (2025-09-22)
 
 ### BREAKING CHANGE
