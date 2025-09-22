@@ -1,0 +1,9 @@
+{
+    "json.schemaDownload.enable": true,
+    "json.schemas": [
+        {
+            "fileMatch": ["wrangler.json"],
+            "url": "./node_modules/wrangler/config-schema.json"
+        }
+    ]
+}
