@@ -1,3 +1,9 @@
+## v0.4.0 (2025-09-22)
+
+### BREAKING CHANGE
+
+- project name has changed; deployment now uses Cloudflare Pages via wrangler instead of local-only builds.
+
 ## v0.3.0 (2025-09-22)
 
 ### BREAKING CHANGE
