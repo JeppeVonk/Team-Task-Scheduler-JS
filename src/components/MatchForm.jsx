@@ -72,7 +72,7 @@ export default function MatchForm({ matches, setMatches }) {
                             <td className="border px-2 py-1">{m.jaar}-{m.maand}-{m.dag}</td>
                             <td className="border px-2 py-1">{m.club}</td>
                             <td className="border px-2 py-1">{m.team}</td>
-                            <td className="border px-2 py-1">{m.uit === "ja" ? "Uit" : "Thuis"}</td>
+                            <td className="border px-2 py-1">{m.isUit === "ja" ? "Uit" : "Thuis"}</td>
                             <td className="border px-2 py-1 text-center">
                                 <button
                                     onClick={()=>removeMatch(i)}
