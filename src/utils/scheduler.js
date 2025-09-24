@@ -43,6 +43,43 @@ function emptyStats(taskNames) {
     return { per_task, total_tasks: 0, km: 0, last_week_index: null };
 }
 
+/**
+ * Deterministic string -> 24-bit hex color.
+ * Uses FNV-1a 32-bit then splits to RGB, then mixes with white like the Python
+ * did (averaging with 255) so colors are lighter and have good readability.
+ */
+export function hashedColorHex(name) {
+    if (!name) return "FFFFFF";
+    // FNV-1a 32-bit
+    let hash = 0x811c9dc5 >>> 0;
+    for (let i = 0; i < name.length; i++) {
+        hash ^= name.charCodeAt(i);
+        hash = Math.imul(hash, 0x01000193) >>> 0;
+    }
+    // Produce 3 bytes from hash
+    const r0 = (hash >>> 0) & 0xff;
+    const g0 = (hash >>> 8) & 0xff;
+    const b0 = (hash >>> 16) & 0xff;
+    // Mix with white (255) to keep colors lighter like Python version
+    const r = Math.floor((r0 + 255) / 2);
+    const g = Math.floor((g0 + 255) / 2);
+    const b = Math.floor((b0 + 255) / 2);
+    return [r, g, b].map(v => v.toString(16).padStart(2, "0").toUpperCase()).join("");
+}
+
+// Pick text color (black/white) depending on background hex for readability
+export function textColorForHex(hex) {
+    // hex: "RRGGBB" or "#RRGGBB"
+    const h = hex.replace("#", "");
+    if (h.length !== 6) return "#000000";
+    const r = parseInt(h.slice(0, 2), 16);
+    const g = parseInt(h.slice(2, 4), 16);
+    const b = parseInt(h.slice(4, 6), 16);
+    // luminance (perceived)
+    const lum = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+    return lum > 180 ? "#000000" : "#FFFFFF";
+}
+
 function chooseCandidates(players, week_index, already, stats, task_name, is_drive, preferences, rnd) {
     function score(p) {
         const ps = stats[p];
