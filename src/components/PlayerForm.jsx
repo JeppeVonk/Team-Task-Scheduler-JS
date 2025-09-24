@@ -24,25 +24,65 @@ export default function PlayerForm({ players, setPlayers, tasks }) {
         setPlayers(updated);
     }
 
-    // Sync: nieuwe taken --> voeg kolommen toe in alle spelers
-    function syncTaskColumns() {
-        const updated = players.map(p => ({
-            ...p,
-            preferences: { ...Object.fromEntries(taskNames.map(t=>[t,2])), ...p.preferences },
-        }));
-        setPlayers(updated);
+    function exportCSV() {
+        const headers = ["Naam", "Display", ...taskNames];
+        const rows = players.map(p => [
+            p.naam,
+            p.displaynaam,
+            ...taskNames.map(t => p.preferences?.[t] ?? 2)
+        ]);
+
+        const csv = [headers, ...rows].map(r => r.map(v => `"${v}"`).join(",")).join("\n");
+
+        const blob = new Blob([csv], { type: "text/csv" });
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "spelers.csv";
+        a.click();
+
+        URL.revokeObjectURL(url);
+    }
+
+    async function importCSV(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const text = await file.text();
+        const [headerLine, ...lines] = text.split("\n").map(l => l.split(",").map(s => s.replace(/(^"|"$)/g, "")));
+
+        const taskHeaders = headerLine.slice(2); // after Naam + Display
+        const importedPlayers = lines.filter(l => l.length > 1).map(line => {
+            const [naam, display, ...prefs] = line;
+            const preferences = Object.fromEntries(taskHeaders.map((t, i) => [t, Number(prefs[i] ?? 2)]));
+            return { naam, displaynaam: display, preferences };
+        });
+
+        setPlayers(importedPlayers);
     }
 
     return (
         <div className="p-4 border rounded-lg bg-white shadow">
             <div className="flex items-baseline justify-between">
                 <h2 className="text-xl font-bold mb-2">Spelers</h2>
-                <button
-                    onClick={syncTaskColumns}
-                    className="text-sm underline"
-                >
-                    Kolommen synchroniseren
-                </button>
+                <div className="flex gap-2">
+                    <label className="text-sm underline cursor-pointer">
+                        Import CSV
+                        <input
+                            type="file"
+                            accept=".csv"
+                            onChange={importCSV}
+                            className="hidden"
+                        />
+                    </label>
+                    <button
+                        onClick={exportCSV}
+                        className="text-sm underline cursor-pointer"
+                    >
+                        Export CSV
+                    </button>
+                </div>
             </div>
             <div className="flex gap-2 mb-2">
                 <input

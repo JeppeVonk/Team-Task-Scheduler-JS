@@ -15,9 +15,49 @@ export default function DistanceForm({ distances, setDistances }) {
         setDistances(distances.filter((_,i)=>i!==idx));
     }
 
+    function exportCSV() {
+        const headers = ["Club", "AfstandKm"];
+        const rows = distances.map(d => [d.club, d.afstand_km]);
+
+        const csv = [headers, ...rows].map(r => r.map(v => `"${v}"`).join(",")).join("\n");
+        const blob = new Blob([csv], { type:"text/csv" });
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "afstanden.csv";
+        a.click();
+        
+        URL.revokeObjectURL(url);
+    }
+
+    async function importCSV(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const text = await file.text();
+        const [headerLine, ...lines] = text.split("\n").map(l => l.split(",").map(s => s.replace(/(^"|"$)/g, "")));
+
+        const imported = lines.filter(l => l.length > 1).map(([club, km]) => ({
+            club,
+            afstand_km: Number(km ?? 0),
+        }));
+
+        setDistances(imported);
+    }
+
     return (
         <div className="p-4 border rounded-lg bg-white shadow">
-            <h2 className="text-xl font-bold mb-2">Afstanden</h2>
+            <div className="flex items-baseline justify-between">
+                <h2 className="text-xl font-bold mb-2">Afstanden</h2>
+                <div className="flex gap-2">
+                    <label className="text-sm underline cursor-pointer">
+                        Import CSV
+                        <input type="file" accept=".csv" onChange={importCSV} className="hidden" />
+                    </label>
+                    <button onClick={exportCSV} className="text-sm underline cursor-pointer">Export CSV</button>
+                </div>
+            </div>
             <div className="flex gap-2 mb-2">
                 <input
                     className="border p-1"
