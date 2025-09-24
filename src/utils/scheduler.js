@@ -103,7 +103,12 @@ function chooseCandidates(players, week_index, already, stats, task_name, is_dri
     return eligible.sort((a,b)=>cmpTuple(score(a), score(b)));
 }
 
-function cmpTuple(a, b) {
+function cmpTuple(a, b, reverse=false) {
+    if (reverse) {
+        const temp = a;
+        a = b;
+        b = temp;
+    }
     for (let i = 0; i < a.length; i++) {
         if (a[i] < b[i]) return -1;
         if (a[i] > b[i]) return 1;
@@ -214,7 +219,7 @@ export function buildSchedule(tasks, matches, players, distances, seed = 42) {
         };
         for (const t of taskNames) r[`${t} count`] = ps.per_task[t] ?? 0;
         return r;
-    }).sort((a,b)=>cmpTuple([a["Totaal taken"], a["Km"], a["Speler"]],[b["Totaal taken"], b["Km"], b["Speler"]]));
+    }).sort((a,b)=>cmpTuple([a["Totaal taken"], a["Km"], a["Speler"]],[b["Totaal taken"], b["Km"], b["Speler"]],true));
 
     return { schedule: rows, stats: stat_rows };
 }
