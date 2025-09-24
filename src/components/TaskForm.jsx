@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { exportCSV, importCSV } from "../utils/csvHelpers";
 
 export default function TaskForm({ tasks, setTasks }) {
     const [taak, setTaak] = useState("");
@@ -16,33 +17,17 @@ export default function TaskForm({ tasks, setTasks }) {
         setTasks(tasks.filter((_, i) => i !== idx));
     }
 
-    function exportCSV() {
+    function handleExport() {
         const headers = ["Taak", "Scope", "Aantal"];
         const rows = tasks.map(t => [t.taak, t.scope, t.aantal]);
-
-        const csv = [headers, ...rows].map(r => r.map(v => `"${v}"`).join(",")).join("\n");
-        const blob = new Blob([csv], { type: "text/csv" });
-        const url = URL.createObjectURL(blob);
-
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "taken.csv";
-        a.click();
-
-        URL.revokeObjectURL(url);
+        exportCSV("taken.csv", headers, rows);
     }
 
-    async function importCSV(e) {
-        const file = e.target.files[0];
-        if (!file) return;
-
-        const text = await file.text();
-        const [headerLine, ...lines] = text.split("\n").map(l => l.split(",").map(s => s.replace(/(^"|"$)/g, "")));
-
-        const imported = lines.filter(l => l.length > 1).map(([taak, scope, aantal]) => ({
+    async function handleImport(e) {
+        const rows = await importCSV(e.target.files[0]);
+        const imported = rows.map(([taak, scope, aantal]) => ({
             taak, scope, aantal: Number(aantal ?? 1),
         }));
-
         setTasks(imported);
     }
 
@@ -53,9 +38,9 @@ export default function TaskForm({ tasks, setTasks }) {
                 <div className="flex gap-2">
                     <label className="text-sm underline cursor-pointer">
                         Import CSV
-                        <input type="file" accept=".csv" onChange={importCSV} className="hidden" />
+                        <input type="file" accept=".csv" onChange={handleImport} className="hidden" />
                     </label>
-                    <button onClick={exportCSV} className="text-sm underline cursor-pointer">Export CSV</button>
+                    <button onClick={handleExport} className="text-sm underline cursor-pointer">Export CSV</button>
                 </div>
             </div>
             <div className="flex flex-wrap gap-2 mb-2">

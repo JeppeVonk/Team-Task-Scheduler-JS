@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { exportCSV, importCSV } from "../utils/csvHelpers";
 
 export default function PlayerForm({ players, setPlayers, tasks }) {
     const [naam, setNaam] = useState("");
@@ -24,42 +25,29 @@ export default function PlayerForm({ players, setPlayers, tasks }) {
         setPlayers(updated);
     }
 
-    function exportCSV() {
+    function handleExport() {
         const headers = ["Naam", "Display", ...taskNames];
         const rows = players.map(p => [
-            p.naam,
-            p.displaynaam,
-            ...taskNames.map(t => p.preferences?.[t] ?? 2)
+            p.naam, p.displaynaam, ...taskNames.map(t => p.preferences?.[t] ?? 2),
         ]);
-
-        const csv = [headers, ...rows].map(r => r.map(v => `"${v}"`).join(",")).join("\n");
-
-        const blob = new Blob([csv], { type: "text/csv" });
-        const url = URL.createObjectURL(blob);
-
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "spelers.csv";
-        a.click();
-
-        URL.revokeObjectURL(url);
+        exportCSV("spelers.csv", headers, rows);
     }
 
-    async function importCSV(e) {
-        const file = e.target.files[0];
-        if (!file) return;
+    async function handleImport(e) {
+        const rows = await importCSV(e.target.files[0]);
 
-        const text = await file.text();
-        const [headerLine, ...lines] = text.split("\n").map(l => l.split(",").map(s => s.replace(/(^"|"$)/g, "")));
+        // Assume header was ["Naam", "Display", ...tasks]
+        const [firstRow] = rows;
+        const taskHeaders = firstRow.length > 2 ? firstRow.slice(2) : taskNames;
 
-        const taskHeaders = headerLine.slice(2); // after Naam + Display
-        const importedPlayers = lines.filter(l => l.length > 1).map(line => {
-            const [naam, display, ...prefs] = line;
-            const preferences = Object.fromEntries(taskHeaders.map((t, i) => [t, Number(prefs[i] ?? 2)]));
+        const imported = rows.map(([naam, display, ...prefs]) => {
+            const preferences = Object.fromEntries(
+                taskHeaders.map((t, i) => [t, Number(prefs[i] ?? 2)])
+            );
             return { naam, displaynaam: display, preferences };
         });
 
-        setPlayers(importedPlayers);
+        setPlayers(imported);
     }
 
     return (
@@ -72,12 +60,12 @@ export default function PlayerForm({ players, setPlayers, tasks }) {
                         <input
                             type="file"
                             accept=".csv"
-                            onChange={importCSV}
+                            onChange={handleImport}
                             className="hidden"
                         />
                     </label>
                     <button
-                        onClick={exportCSV}
+                        onClick={handleExport}
                         className="text-sm underline cursor-pointer"
                     >
                         Export CSV
