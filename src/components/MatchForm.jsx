@@ -27,7 +27,7 @@ export default function MatchForm({ matches, setMatches }) {
     }
 
     async function handleImport(e) {
-        const rows = await importCSV(e.target.files[0]);
+        const { rows } = await importCSV(e.target.files[0]);
         const imported = rows.map(([jaar, maand, dag, club, team, isUit]) => ({
             jaar, maand, dag, club, team, isUit,
         }));

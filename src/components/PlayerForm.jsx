@@ -34,15 +34,17 @@ export default function PlayerForm({ players, setPlayers, tasks }) {
     }
 
     async function handleImport(e) {
-        const rows = await importCSV(e.target.files[0]);
+        const { headers, rows } = await importCSV(e.target.files[0]);
 
-        // Assume header was ["Naam", "Display", ...tasks]
-        const [firstRow] = rows;
-        const taskHeaders = firstRow.length > 2 ? firstRow.slice(2) : taskNames;
+        // CSV always starts with ["Naam", "Display", ...task headers]
+        const csvTaskHeaders = headers.slice(2);
+
+        // Merge CSV task headers with current taskNames
+        const mergedTaskHeaders = Array.from(new Set([...taskNames, ...csvTaskHeaders]));
 
         const imported = rows.map(([naam, display, ...prefs]) => {
             const preferences = Object.fromEntries(
-                taskHeaders.map((t, i) => [t, Number(prefs[i] ?? 2)])
+                mergedTaskHeaders.map((t, i) => [t, Number(prefs[i] ?? 2)])
             );
             return { naam, displaynaam: display, preferences };
         });

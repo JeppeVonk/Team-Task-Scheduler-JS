@@ -24,7 +24,7 @@ export default function TaskForm({ tasks, setTasks }) {
     }
 
     async function handleImport(e) {
-        const rows = await importCSV(e.target.files[0]);
+        const { rows } = await importCSV(e.target.files[0]);
         const imported = rows.map(([taak, scope, aantal]) => ({
             taak, scope, aantal: Number(aantal ?? 1),
         }));

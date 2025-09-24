@@ -23,7 +23,7 @@ export default function DistanceForm({ distances, setDistances }) {
     }
 
     async function handleImport(e) {
-        const rows = await importCSV(e.target.files[0]);
+        const { rows } = await importCSV(e.target.files[0]);
         const imported = rows.map(([club, km]) => ({
             club, afstand_km: Number(km ?? 0),
         }));

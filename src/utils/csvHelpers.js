@@ -15,13 +15,13 @@ export function exportCSV(filename, headers, rows) {
 }
 
 export async function importCSV(file) {
-    if (!file) return [];
+    if (!file) return { headers: [], rows: [] };
 
     const text = await file.text();
     const lines = text.trim().split("\n").map(l => l.split(",").map(s => s.replace(/(^"|"$)/g, "")));
 
-    if (lines.length < 2) return [];
+    if (lines.length < 2) return { headers: [], rows: [] };
 
-    const [, ...rows] = lines; // skip header
-    return rows.filter(r => r.length > 1);
+    const [headers, ...rows] = lines;
+    return { headers, rows: rows.filter(r => r.length > 1) };
 }
