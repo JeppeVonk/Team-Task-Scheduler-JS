@@ -1,3 +1,16 @@
+## v0.5.0 (2025-09-24)
+
+### Feat
+
+- **forms**: add CSV import/export for players, tasks, matches, and distances
+- **ui,export**: add deterministic player colors in schedule and Excel
+
+### Refactor
+
+- **csv**: return headers + rows from importCSV
+- **csv**: centralize import/export logic in csvHelpers
+- **scheduler**: add reverse option to cmpTuple and use for stats sorting
+
 ## v0.4.1 (2025-09-22)
 
 ### Perf
